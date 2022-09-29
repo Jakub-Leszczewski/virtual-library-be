@@ -11,4 +11,8 @@ export const config = {
   jwtTimeToExpire: '0s',
   jwtCookieTimeToExpire: 0,
   jwtCookieDomain: 'host',
+  mailHost: 'host',
+  mailPort: 1234,
+  mailUsername: 'mail_username',
+  mailPassword: 'mail_password',
 };

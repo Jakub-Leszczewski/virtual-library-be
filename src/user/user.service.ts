@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -11,15 +12,19 @@ import {
   CreateAdminResponse,
   CreateUserResponse,
   SecureUserData,
+  SendAdminTokenResponse,
   UserRole,
 } from '../types';
 import { AdminToken } from './entities/admin-token.entity';
 import { SendAdminTokenDto } from './dto/send-admin-token.dto';
 import { v4 as uuid } from 'uuid';
+import { MailService } from '../common/providers/mail/mail.service';
 
 @Injectable()
 export class UserService {
-  async create(createUserDto: CreateUserDto, role: UserRole) {
+  constructor(@Inject(MailService) private mailService: MailService) {}
+
+  async create(createUserDto: CreateUserDto, role: UserRole): Promise<User> {
     const { firstName, lastName, password, email, username } = createUserDto;
 
     await this.checkUserFieldUniquenessAndThrow({ email });
@@ -58,25 +63,33 @@ export class UserService {
     return this.filter(user);
   }
 
-  async sendAdminToken({ email }: SendAdminTokenDto) {
+  async sendAdminToken({
+    email,
+  }: SendAdminTokenDto): Promise<SendAdminTokenResponse> {
     const adminToken = await AdminToken.findOne({ where: { email } });
+
+    const token = await this.newAdminToken();
     const newDate = new Date(new Date().getTime() + 1000 * 60 * 60 * 24);
 
     if (adminToken) {
-      adminToken.token = await this.newAdminToken();
+      adminToken.token = token;
       adminToken.expiredAt = newDate;
+
       await adminToken.save();
+      await this.mailService.sendAdminToken(email, { token });
 
       return { ok: true };
     }
 
     const newAdminToken = new AdminToken();
     newAdminToken.email = email;
-    newAdminToken.token = await this.newAdminToken();
+    newAdminToken.token = token;
     newAdminToken.expiredAt = newDate;
 
-    //@TODO implement sendMail
-    return { ok: false };
+    await adminToken.save();
+    await this.mailService.sendAdminToken(email, { token });
+
+    return { ok: true };
   }
 
   async newAdminToken(): Promise<string> {
