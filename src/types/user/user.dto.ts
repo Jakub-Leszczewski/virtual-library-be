@@ -5,3 +5,7 @@ export interface CreateUserDtoInterface {
   email: string;
   password: string;
 }
+
+export interface SendAdminTokenDtoInterface {
+  email: string;
+}

@@ -19,4 +19,7 @@ export class AdminToken extends BaseEntity implements AdminTokenInterface {
   @Column({ length: 36 })
   @Index({ unique: true })
   token: string;
+
+  @Column({ type: 'datetime' })
+  expiredAt: Date;
 }
