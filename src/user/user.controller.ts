@@ -26,7 +26,7 @@ export class UserController {
     return this.userService.sendAdminToken(sendAdminTokenDto);
   }
 
-  //@TODO create guard that validates the token and email and expired time
+  //@TODO create guard that validates the token, email, expired time
   @Post('/admin/:token')
   async createAdmin(
     @Param('token') token: string,

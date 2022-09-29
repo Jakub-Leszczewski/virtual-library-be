@@ -8,7 +8,7 @@ export = {
     from: 'no-replay@exaple.com',
   },
   template: {
-    dir: join(__dirname, '../templates/mail'),
+    dir: join(__dirname, '../../../../templates/mail'),
     adapter: new HandlebarsAdapter(),
     options: {
       strict: true,

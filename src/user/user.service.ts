@@ -19,6 +19,7 @@ import { AdminToken } from './entities/admin-token.entity';
 import { SendAdminTokenDto } from './dto/send-admin-token.dto';
 import { v4 as uuid } from 'uuid';
 import { MailService } from '../common/providers/mail/mail.service';
+import { FindOptionsWhere } from 'typeorm';
 
 @Injectable()
 export class UserService {
@@ -66,8 +67,9 @@ export class UserService {
   async sendAdminToken({
     email,
   }: SendAdminTokenDto): Promise<SendAdminTokenResponse> {
-    const adminToken = await AdminToken.findOne({ where: { email } });
+    await this.checkUserFieldUniquenessAndThrow({ email });
 
+    const adminToken = await AdminToken.findOne({ where: { email } });
     const token = await this.newAdminToken();
     const newDate = new Date(new Date().getTime() + 1000 * 60 * 60 * 24);
 
