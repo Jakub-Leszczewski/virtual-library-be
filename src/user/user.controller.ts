@@ -21,12 +21,12 @@ export class UserController {
 
   @Post('/admin')
   async sendAdminToken(
-    sendAdminTokenDto: SendAdminTokenDto,
+    @Body() sendAdminTokenDto: SendAdminTokenDto,
   ): Promise<SendAdminTokenResponse> {
     return this.userService.sendAdminToken(sendAdminTokenDto);
   }
 
-  //@TODO create guard that validates the token and email
+  //@TODO create guard that validates the token and email and expired time
   @Post('/admin/:token')
   async createAdmin(
     @Param('token') token: string,

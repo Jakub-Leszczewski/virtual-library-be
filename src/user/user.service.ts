@@ -55,7 +55,7 @@ export class UserService {
     if (!token) throw new BadRequestException();
 
     const adminToken = await AdminToken.findOne({ where: { token } });
-    if (adminToken) throw new NotFoundException();
+    if (!adminToken) throw new NotFoundException();
 
     const user = await this.create(createUserDto, UserRole.Admin);
     await adminToken.remove();
@@ -86,7 +86,7 @@ export class UserService {
     newAdminToken.token = token;
     newAdminToken.expiredAt = newDate;
 
-    await adminToken.save();
+    await newAdminToken.save();
     await this.mailService.sendAdminToken(email, { token });
 
     return { ok: true };
@@ -118,11 +118,11 @@ export class UserService {
   async checkAdminTokenFieldUniqueness(value: {
     [key: string]: any;
   }): Promise<boolean> {
-    const user = await User.count({
+    const adminToken = await AdminToken.count({
       where: value,
     });
 
-    return !user;
+    return !adminToken;
   }
 
   filter(user: User): SecureUserData {
