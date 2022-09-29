@@ -14,9 +14,9 @@ export class UserController {
   //@TODO create guard that validates the token and email
   @Post('/admin/:token')
   async createAdmin(
-    @Param('token') adminToken: string,
+    @Param('token') token: string,
     @Body() createUserDto: CreateUserDto,
   ) {
-    return this.userService.createAdmin(createUserDto);
+    return this.userService.createAdmin(token, createUserDto);
   }
 }

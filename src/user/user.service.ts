@@ -1,4 +1,9 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
 import { createHashPwd } from '../common/utils/create-hash-pwd';
@@ -8,6 +13,7 @@ import {
   SecureUserData,
   UserRole,
 } from '../types';
+import { AdminToken } from './entities/admin-token.entity';
 
 @Injectable()
 export class UserService {
@@ -36,10 +42,17 @@ export class UserService {
   }
 
   async createAdmin(
+    token: string,
     createUserDto: CreateUserDto,
   ): Promise<CreateAdminResponse> {
+    if (!token) throw new BadRequestException();
+
+    const adminToken = await AdminToken.findOne({ where: { token } });
+    if (adminToken) throw new NotFoundException();
+
     const user = await this.create(createUserDto, UserRole.Admin);
-    //@TODO call a function to remove a token
+    await adminToken.remove();
+
     return this.filter(user);
   }
 
