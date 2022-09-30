@@ -18,6 +18,7 @@ import {
   CreateBookResponse,
   FindAllBookResponse,
   FindOneBookResponse,
+  RemoveBookResponse,
   UpdateBookResponse,
   UserRole,
 } from '../types';
@@ -65,7 +66,9 @@ export class BookController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @SetRole(UserRole.Admin)
+  async remove(@Param('id') id: string): Promise<RemoveBookResponse> {
     return this.bookService.remove(id);
   }
 }

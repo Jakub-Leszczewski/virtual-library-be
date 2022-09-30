@@ -7,6 +7,7 @@ import {
   CreateBookResponse,
   FindAllBookResponse,
   FindOneBookResponse,
+  RemoveBookResponse,
   SecureBookData,
   UpdateBookResponse,
 } from '../types';
@@ -92,8 +93,14 @@ export class BookService {
     return this.filter(book);
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} book`;
+  async remove(id: string): Promise<RemoveBookResponse> {
+    if (!id) throw new BadRequestException();
+
+    const book = await this.getBook({ id });
+    if (!book) throw new NotFoundException();
+
+    await book.remove();
+    return this.filter(book);
   }
 
   filter(book: Book): SecureBookData {
