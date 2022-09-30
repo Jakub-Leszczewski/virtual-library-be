@@ -1,24 +1,44 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Query,
+} from '@nestjs/common';
 import { BookService } from './book.service';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { RoleGuard } from '../common/guards/role.guard';
 import { SetRole } from '../common/decorators/set-role.decorator';
-import { CreateBookResponse, UserRole } from '../types';
+import { CreateBookResponse, FindOneBookResponse, UserRole } from '../types';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { FindOneQueryDto } from './dto/find-one-query.dto';
+import { OnlyRolesSecureDataGuard } from '../common/guards/only-roles-secure-guard.service';
+import { FindAllQueryDto } from './dto/find-all-query.dto';
 
 @Controller('book')
 export class BookController {
   constructor(private readonly bookService: BookService) {}
 
   @Get()
-  findAll() {
-    return this.bookService.findAll();
+  @UseGuards(JwtAuthGuard, OnlyRolesSecureDataGuard)
+  @SetRole('admin')
+  findAll(@Query() query: FindAllQueryDto) {
+    return this.bookService.findAll(query);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.bookService.findOne(id);
+  @UseGuards(JwtAuthGuard, OnlyRolesSecureDataGuard)
+  @SetRole('admin')
+  async findOne(
+    @Param('id') id: string,
+    @Query() findOneQueryDto: FindOneQueryDto,
+  ): Promise<FindOneBookResponse> {
+    return this.bookService.findOne(id, findOneQueryDto);
   }
 
   @Post()

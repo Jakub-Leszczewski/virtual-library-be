@@ -1,17 +1,59 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { Book } from './entities/book.entity';
-import { CreateBookResponse, SecureBookData } from '../types';
+import { BookStatus, CreateBookResponse, FindOneBookResponse, SecureBookData } from '../types';
+import { DataSource, FindOperator, FindOptionsWhere, IsNull, Not } from 'typeorm';
+import { FindOneQueryDto } from './dto/find-one-query.dto';
+import { FindAllQueryDto } from './dto/find-all-query.dto';
+import { config } from '../config/config';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class BookService {
-  findAll() {
-    return `This action returns all book`;
+  constructor(
+    @Inject(DataSource) private dataSource: DataSource,
+    @Inject(UserService) private userService: UserService,
+  ) {}
+
+  async getBook(where: FindOptionsWhere<Book>) {
+    return Book.findOne({
+      where,
+      relations: ['borrowedBy'],
+    });
   }
 
-  findOne(id: string) {
-    return `This action returns a #${id} book`;
+  async findAll(query: FindAllQueryDto) {
+    const { secure, page, status } = query;
+    let borrowedBy: FindOperator<any> | undefined = undefined;
+
+    if (status === BookStatus.Available) borrowedBy = IsNull();
+    else if (status === BookStatus.Borrowed) borrowedBy = Not(IsNull());
+
+    const [book, totalBooksCount] = await Book.findAndCount({
+      where: { borrowedBy },
+      relations: ['borrowedBy'],
+      order: { title: 'asc' },
+      skip: config.itemsCountPerPage * (page - 1),
+      take: config.itemsCountPerPage,
+    });
+
+    return {
+      books: secure ? book.map((e) => this.filterSecure(e)) : book.map((e) => this.filter(e)),
+      totalPages: Math.ceil(totalBooksCount / config.itemsCountPerPage),
+      totalBooksCount,
+    };
+  }
+
+  async findOne(id: string, { secure }: FindOneQueryDto): Promise<FindOneBookResponse> {
+    if (!id) throw new BadRequestException();
+
+    const book = await this.getBook({ id });
+    if (!book) throw new NotFoundException();
+
+    if (!secure) return this.filter(book);
+
+    return book;
   }
 
   async create(createBookDto: CreateBookDto): Promise<CreateBookResponse> {
@@ -42,6 +84,16 @@ export class BookService {
     return {
       ...bookResponse,
       isBorrowed: !!borrowedBy,
+    };
+  }
+
+  filterSecure(book: Book) {
+    const { borrowedBy, ...bookResponse } = book;
+    const filteredUser = borrowedBy && this.userService.filter(borrowedBy);
+
+    return {
+      ...bookResponse,
+      borrowedBy: filteredUser,
     };
   }
 }
