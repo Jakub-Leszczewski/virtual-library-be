@@ -100,13 +100,19 @@ export class UserService {
     return token;
   }
 
-  async checkUserFieldUniquenessAndThrow(value: { [key: string]: any }): Promise<void> {
+  async checkUserFieldUniqueness(value: { [key: string]: any }): Promise<boolean> {
     const user = await User.count({
       where: value,
     });
 
+    return !user;
+  }
+
+  async checkUserFieldUniquenessAndThrow(value: { [key: string]: any }): Promise<void> {
+    const result = await this.checkUserFieldUniqueness(value);
+
     const [key] = Object.keys(value);
-    if (user) throw new ConflictException(`${key} is not unique`);
+    if (!result) throw new ConflictException(`${key} is not unique`);
   }
 
   async checkAdminTokenFieldUniqueness(value: { [key: string]: any }): Promise<boolean> {

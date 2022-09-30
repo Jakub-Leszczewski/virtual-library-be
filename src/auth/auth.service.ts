@@ -1,26 +1,72 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { compare } from 'bcrypt';
+import { User } from '../user/entities/user.entity';
+import { config } from '../config/config';
+import { Response } from 'express';
+import { UserService } from '../user/user.service';
+import { JwtService } from '@nestjs/jwt';
+import { v4 as uuid } from 'uuid';
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
+  constructor(
+    @Inject(UserService) private userService: UserService,
+    @Inject(JwtService) private jwtService: JwtService,
+  ) {}
+
+  async validateUser(username: string, password: string): Promise<User | null> {
+    if (!username) throw new BadRequestException();
+
+    const user = await User.findOne({
+      where: { username },
+    });
+
+    if (user) {
+      const hashCompareResult = await compare(password, user.hashPwd);
+
+      if (hashCompareResult) {
+        return user;
+      }
+    }
+
+    return null;
   }
 
-  findAll() {
-    return `This action returns all auth`;
+  async login(user: User, res: Response): Promise<any> {
+    if (user.jwtId) {
+      const payload = { jwtId: user.jwtId };
+      res.cookie('access_token', this.jwtService.sign(payload), {
+        secure: false,
+        httpOnly: true,
+        maxAge: config.jwtCookieTimeToExpire,
+        domain: config.jwtCookieDomain,
+      });
+    } else {
+      user.jwtId = await this.generateNewJwtId();
+      await user.save();
+
+      const payload = { jwtId: user.jwtId };
+      res.cookie('access_token', this.jwtService.sign(payload), {
+        secure: false,
+        httpOnly: true,
+        maxAge: config.jwtCookieTimeToExpire,
+        domain: config.jwtCookieDomain,
+      });
+    }
+
+    return this.userService.filter(user);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
+  async generateNewJwtId(): Promise<string> {
+    let isUniqueness: boolean;
+    let newJwtId: string;
+    do {
+      newJwtId = uuid();
+      isUniqueness = await this.userService.checkUserFieldUniqueness({
+        jwtId: newJwtId,
+      });
+    } while (!isUniqueness);
 
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+    return newJwtId;
   }
 }
