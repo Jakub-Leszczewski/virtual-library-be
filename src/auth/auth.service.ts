@@ -6,6 +6,7 @@ import { Response } from 'express';
 import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { v4 as uuid } from 'uuid';
+import { LogoutResponse } from '../types';
 
 @Injectable()
 export class AuthService {
@@ -38,13 +39,27 @@ export class AuthService {
 
     const payload = { jwtId: user.jwtId };
     res.cookie('access_token', this.jwtService.sign(payload), {
-      secure: false,
+      secure: config.cookieSecure,
       httpOnly: true,
       maxAge: config.jwtCookieTimeToExpire,
       domain: config.jwtCookieDomain,
     });
 
     return this.userService.filter(user);
+  }
+
+  async logout(user: User, res: Response): Promise<LogoutResponse> {
+    user.jwtId = null;
+    await user.save();
+
+    res.clearCookie('access_token', {
+      secure: config.cookieSecure,
+      httpOnly: true,
+      maxAge: config.jwtCookieTimeToExpire,
+      domain: config.jwtCookieDomain,
+    });
+
+    return { ok: true };
   }
 
   async generateNewJwtId(): Promise<string> {
