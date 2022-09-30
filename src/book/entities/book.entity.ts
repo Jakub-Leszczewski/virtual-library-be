@@ -14,7 +14,7 @@ export class Book extends BaseEntity implements BookInterface {
   @Column({ length: 128 })
   author: string;
 
-  @Column({ length: 13 })
+  @Column({ length: 17 })
   isbn: string;
 
   @Column({ type: 'datetime' })
