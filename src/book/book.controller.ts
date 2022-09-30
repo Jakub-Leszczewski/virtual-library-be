@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Query,
+  Inject,
 } from '@nestjs/common';
 import { BookService } from './book.service';
 import { CreateBookDto } from './dto/create-book.dto';
@@ -29,7 +30,7 @@ import { FindAllQueryDto } from './dto/find-all-query.dto';
 
 @Controller('book')
 export class BookController {
-  constructor(private readonly bookService: BookService) {}
+  constructor(@Inject(BookService) private bookService: BookService) {}
 
   @Get()
   @UseGuards(JwtAuthGuard, OnlyRolesSecureDataGuard)
