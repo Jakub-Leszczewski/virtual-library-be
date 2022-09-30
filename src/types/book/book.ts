@@ -1,4 +1,4 @@
-import { UserInterface } from '../user';
+import { SecureUserData, UserInterface } from '../user';
 
 export interface BookInterface {
   id: string;
@@ -8,6 +8,10 @@ export interface BookInterface {
   borrowedAt: Date | null;
   borrowedBy: UserInterface | null;
 }
+
+export type NotSecureBookData = Omit<BookInterface, 'borrowedBy'> & {
+  borrowedBy: SecureUserData | null;
+};
 
 export type SecureBookData = Omit<BookInterface, 'borrowedAt' | 'borrowedBy'> & {
   isBorrowed: boolean;
