@@ -33,26 +33,16 @@ export class AuthService {
   }
 
   async login(user: User, res: Response): Promise<any> {
-    if (user.jwtId) {
-      const payload = { jwtId: user.jwtId };
-      res.cookie('access_token', this.jwtService.sign(payload), {
-        secure: false,
-        httpOnly: true,
-        maxAge: config.jwtCookieTimeToExpire,
-        domain: config.jwtCookieDomain,
-      });
-    } else {
-      user.jwtId = await this.generateNewJwtId();
-      await user.save();
+    user.jwtId = await this.generateNewJwtId();
+    await user.save();
 
-      const payload = { jwtId: user.jwtId };
-      res.cookie('access_token', this.jwtService.sign(payload), {
-        secure: false,
-        httpOnly: true,
-        maxAge: config.jwtCookieTimeToExpire,
-        domain: config.jwtCookieDomain,
-      });
-    }
+    const payload = { jwtId: user.jwtId };
+    res.cookie('access_token', this.jwtService.sign(payload), {
+      secure: false,
+      httpOnly: true,
+      maxAge: config.jwtCookieTimeToExpire,
+      domain: config.jwtCookieDomain,
+    });
 
     return this.userService.filter(user);
   }
