@@ -48,10 +48,7 @@ export class UserService {
     return this.filter(user);
   }
 
-  async createAdmin(
-    token: string,
-    createUserDto: CreateUserDto,
-  ): Promise<CreateAdminResponse> {
+  async createAdmin(token: string, createUserDto: CreateUserDto): Promise<CreateAdminResponse> {
     if (!token) throw new BadRequestException();
 
     const adminToken = await AdminToken.findOne({ where: { token } });
@@ -63,9 +60,7 @@ export class UserService {
     return this.filter(user);
   }
 
-  async sendAdminToken({
-    email,
-  }: SendAdminTokenDto): Promise<SendAdminTokenResponse> {
+  async sendAdminToken({ email }: SendAdminTokenDto): Promise<SendAdminTokenResponse> {
     await this.checkUserFieldUniquenessAndThrow({ email });
 
     const adminToken = await AdminToken.findOne({ where: { email } });
@@ -105,20 +100,22 @@ export class UserService {
     return token;
   }
 
-  async checkUserFieldUniquenessAndThrow(value: {
-    [key: string]: any;
-  }): Promise<void> {
+  async checkUserFieldUniqueness(value: { [key: string]: any }): Promise<boolean> {
     const user = await User.count({
       where: value,
     });
 
-    const [key] = Object.keys(value);
-    if (user) throw new ConflictException(`${key} is not unique`);
+    return !user;
   }
 
-  async checkAdminTokenFieldUniqueness(value: {
-    [key: string]: any;
-  }): Promise<boolean> {
+  async checkUserFieldUniquenessAndThrow(value: { [key: string]: any }): Promise<void> {
+    const result = await this.checkUserFieldUniqueness(value);
+
+    const [key] = Object.keys(value);
+    if (!result) throw new ConflictException(`${key} is not unique`);
+  }
+
+  async checkAdminTokenFieldUniqueness(value: { [key: string]: any }): Promise<boolean> {
     const adminToken = await AdminToken.count({
       where: value,
     });
