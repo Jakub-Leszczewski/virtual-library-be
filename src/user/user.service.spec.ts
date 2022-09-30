@@ -135,6 +135,7 @@ describe('UserService', () => {
     const result = await service.newAdminToken();
 
     expect(result).toBeDefined();
+    expect(result.length).toBe(36);
   });
 
   it("create should throw conflict ConflictException if email or username isn't unique", async () => {
