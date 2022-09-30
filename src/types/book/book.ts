@@ -8,3 +8,7 @@ export interface BookInterface {
   borrowedAt: Date | null;
   borrowedBy: UserInterface | null;
 }
+
+export type SecureBookData = Omit<BookInterface, 'borrowedAt' | 'borrowedBy'> & {
+  isBorrowed: boolean;
+};

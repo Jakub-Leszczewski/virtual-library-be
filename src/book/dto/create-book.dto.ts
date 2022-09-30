@@ -11,6 +11,6 @@ export class CreateBookDto implements CreateBookDtoInterface {
   author: string;
 
   @IsString()
-  @Length(1, 17)
+  @Length(17, 17)
   isbn: string;
 }

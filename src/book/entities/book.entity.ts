@@ -1,7 +1,6 @@
-import { BaseEntity, Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, ManyToOne, JoinColumn, PrimaryGeneratedColumn } from 'typeorm';
 import { BookInterface } from '../../types';
 import { User } from '../../user/entities/user.entity';
-import { JoinColumn } from 'typeorm/browser';
 
 @Entity()
 export class Book extends BaseEntity implements BookInterface {
@@ -17,7 +16,11 @@ export class Book extends BaseEntity implements BookInterface {
   @Column({ length: 17 })
   isbn: string;
 
-  @Column({ type: 'datetime' })
+  @Column({
+    type: 'datetime',
+    nullable: true,
+    default: null,
+  })
   borrowedAt: Date | null;
 
   @ManyToOne((type) => User, (user) => user.borrowedBooks)
