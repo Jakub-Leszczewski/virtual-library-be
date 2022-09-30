@@ -93,16 +93,30 @@ describe('UserService', () => {
     expect(service.filter(userMock)).toEqual(userResponse);
   });
 
-  it('checkUserFieldUniquenessAndThrow should throw ConflictException', () => {
+  it('checkUserFieldUniqueness should return false', async () => {
     jest.spyOn(User, 'count').mockResolvedValue(1);
+
+    const result = await service.checkUserFieldUniqueness({ email: 'abc@xyz.pl' });
+    expect(result).toBe(false);
+  });
+
+  it('checkUserFieldUniqueness should return true', async () => {
+    jest.spyOn(User, 'count').mockResolvedValue(0);
+
+    const result = await service.checkUserFieldUniqueness({ email: 'abc@xyz.pl' });
+    expect(result).toBe(true);
+  });
+
+  it('checkUserFieldUniquenessAndThrow should throw error', () => {
+    jest.spyOn(UserService.prototype, 'checkUserFieldUniqueness').mockResolvedValue(false);
 
     expect(
       async () => await service.checkUserFieldUniquenessAndThrow({ email: 'abc@xyz.pl' }),
     ).rejects.toThrowError(ConflictException);
   });
 
-  it("checkUserFieldUniquenessAndThrow shouldn't throw ConflictException", async () => {
-    jest.spyOn(User, 'count').mockResolvedValue(0);
+  it("checkUserFieldUniquenessAndThrow shouldn't throw error", async () => {
+    jest.spyOn(UserService.prototype, 'checkUserFieldUniqueness').mockResolvedValue(true);
 
     await expect(
       service.checkUserFieldUniquenessAndThrow({ email: 'abc@xyz.pl' }),
