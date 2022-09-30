@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Param } from '@nestjs/common';
+import { Controller, Post, Body, Param, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { SendAdminTokenDto } from './dto/send-admin-token.dto';
@@ -6,20 +6,24 @@ import {
   CreateAdminResponse,
   CreateUserResponse,
   SendAdminTokenResponse,
+  UserRole,
 } from '../types';
+import { RoleGuard } from '../common/guards/role.guard';
+import { SetRole } from '../common/decorators/set-role.decorator';
+import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
-  async createUser(
-    @Body() createUserDto: CreateUserDto,
-  ): Promise<CreateUserResponse> {
+  async createUser(@Body() createUserDto: CreateUserDto): Promise<CreateUserResponse> {
     return this.userService.createUser(createUserDto);
   }
 
   @Post('/admin')
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @SetRole(UserRole.Admin)
   async sendAdminToken(
     @Body() sendAdminTokenDto: SendAdminTokenDto,
   ): Promise<SendAdminTokenResponse> {
