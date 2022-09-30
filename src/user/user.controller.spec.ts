@@ -56,21 +56,21 @@ describe('UserController', () => {
     expect(controller).toBeDefined();
   });
 
-  it('create - should calls to userService.create', async () => {
+  it('createUser - should calls to userService.createUser', async () => {
     const result: any = await controller.createUser(bodyMock);
 
     expect(result.result).toBe(createUserResult);
     expect(result.body).toEqual(bodyMock);
   });
 
-  it('findOne - should calls to userService.findOne', async () => {
+  it('sendAdminToken - should calls to userService.sendAdminToken', async () => {
     const result: any = await controller.sendAdminToken(bodyMock);
 
     expect(result.result).toBe(sendAdminTokenResult);
     expect(result.body).toBe(bodyMock);
   });
 
-  it('getUserIndex - should calls to userService.getUserIndex', async () => {
+  it('createAdmin - should calls to userService.createAdmin', async () => {
     const result: any = await controller.createAdmin(tokenMock, bodyMock);
 
     expect(result.result).toBe(createAdminResult);

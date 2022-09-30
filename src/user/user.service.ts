@@ -19,7 +19,6 @@ import { AdminToken } from './entities/admin-token.entity';
 import { SendAdminTokenDto } from './dto/send-admin-token.dto';
 import { v4 as uuid } from 'uuid';
 import { MailService } from '../common/providers/mail/mail.service';
-import { FindOptionsWhere } from 'typeorm';
 
 @Injectable()
 export class UserService {
