@@ -3,7 +3,7 @@ import { AuthService } from './auth.service';
 import { UserObj } from '../common/decorators/user.decorator';
 import { User } from '../user/entities/user.entity';
 import { AuthGuard } from '@nestjs/passport';
-import { LoginResponse, LogoutResponse } from '../types';
+import { GetUserFromTokenResponse, LoginResponse, LogoutResponse } from '../types';
 import { Response } from 'express';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { UserService } from '../user/user.service';
@@ -32,5 +32,11 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<LogoutResponse> {
     return this.authService.logout(user, res);
+  }
+
+  @Get('/user')
+  @UseGuards(JwtAuthGuard)
+  async getAuthUser(@UserObj() user: User): Promise<GetUserFromTokenResponse> {
+    return this.userService.filter(user);
   }
 }
