@@ -60,6 +60,7 @@ export class AuthService {
   async generateNewJwtId(): Promise<string> {
     let isUniqueness: boolean;
     let newJwtId: string;
+
     do {
       newJwtId = uuid();
       isUniqueness = await this.userService.checkUserFieldUniqueness({
