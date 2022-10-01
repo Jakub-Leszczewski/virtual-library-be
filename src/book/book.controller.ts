@@ -27,7 +27,6 @@ import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { FindOneQueryDto } from './dto/find-one-query.dto';
 import { OnlyRolesSecureDataGuard } from '../common/guards/only-roles-secure-data.guard';
 import { FindAllQueryDto } from './dto/find-all-query.dto';
-import { BookBorrowDto } from './dto/book-borrow.dto';
 import { UserObj } from '../common/decorators/user.decorator';
 import { User } from '../user/entities/user.entity';
 
@@ -78,12 +77,16 @@ export class BookController {
 
   //@TODO create guard who check book available
   @Patch(':id/borrow')
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @SetRole('user')
   async bookBorrow(@Param('id') id: string, @UserObj() user: User) {
     return this.bookService.borrow(id, user);
   }
 
   //@TODO create guard who check if borrowedBy equal logged user
   @Delete(':id/borrow')
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @SetRole('user')
   async bookReturn(@Param('id') id: string) {
     return this.bookService.return(id);
   }

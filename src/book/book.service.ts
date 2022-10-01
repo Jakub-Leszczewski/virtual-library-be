@@ -16,7 +16,6 @@ import { FindOneQueryDto } from './dto/find-one-query.dto';
 import { FindAllQueryDto } from './dto/find-all-query.dto';
 import { config } from '../config/config';
 import { UserService } from '../user/user.service';
-import { BookBorrowDto } from './dto/book-borrow.dto';
 import { User } from '../user/entities/user.entity';
 
 @Injectable()
