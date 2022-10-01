@@ -16,6 +16,8 @@ import { FindOneQueryDto } from './dto/find-one-query.dto';
 import { FindAllQueryDto } from './dto/find-all-query.dto';
 import { config } from '../config/config';
 import { UserService } from '../user/user.service';
+import { BookBorrowDto } from './dto/book-borrow.dto';
+import { User } from '../user/entities/user.entity';
 
 @Injectable()
 export class BookService {
@@ -100,6 +102,17 @@ export class BookService {
     if (!book) throw new NotFoundException();
 
     await book.remove();
+    return this.filter(book);
+  }
+
+  async borrow(id: string, user: User) {
+    if (!id) throw new BadRequestException();
+
+    const book = await this.getBook({ id });
+    book.borrowedBy = user;
+    book.borrowedAt = new Date();
+    await book.save();
+
     return this.filter(book);
   }
 

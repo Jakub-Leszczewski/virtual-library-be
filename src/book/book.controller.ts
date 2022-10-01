@@ -27,6 +27,9 @@ import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { FindOneQueryDto } from './dto/find-one-query.dto';
 import { OnlyRolesSecureDataGuard } from '../common/guards/only-roles-secure-data.guard';
 import { FindAllQueryDto } from './dto/find-all-query.dto';
+import { BookBorrowDto } from './dto/book-borrow.dto';
+import { UserObj } from '../common/decorators/user.decorator';
+import { User } from '../user/entities/user.entity';
 
 @Controller('book')
 export class BookController {
@@ -73,11 +76,13 @@ export class BookController {
     return this.bookService.remove(id);
   }
 
+  //@TODO create guard who check book available
   @Patch(':id/borrow')
-  async bookBorrow() {
-    return undefined;
+  async bookBorrow(@Param('id') id: string, @UserObj() user: User) {
+    return this.bookService.borrow(id, user);
   }
 
+  //@TODO create guard who check if borrowedBy equal logged user
   @Delete(':id/borrow')
   async bookReturn() {
     return undefined;
