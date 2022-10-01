@@ -6,12 +6,6 @@ import { v4 as uuid } from 'uuid';
 
 const moduleMocker = new ModuleMocker(global);
 
-const findAllResult = 'findAll';
-const findOneResult = 'findOne';
-const createResult = 'create';
-const updateResult = 'update';
-const removeResult = 'remove';
-
 const findAllSpy = jest.fn();
 const findOneSpy = jest.fn();
 const createSpy = jest.fn();
@@ -54,32 +48,27 @@ describe('BookController', () => {
   });
 
   it('findOne should calls to bookService.findOne', async () => {
-    const result: any = await controller.findOne(bookId, queryMock);
-
+    await controller.findOne(bookId, queryMock);
     expect(findOneSpy).toHaveBeenCalledWith(bookId, queryMock);
   });
 
   it('findAll should calls to bookService.findAll', async () => {
-    const result: any = await controller.findAll(queryMock);
-
+    await controller.findAll(queryMock);
     expect(findAllSpy).toHaveBeenCalledWith(queryMock);
   });
 
   it('create should calls to bookService.create', async () => {
-    const result: any = await controller.create(bodyMock);
-
+    await controller.create(bodyMock);
     expect(createSpy).toHaveBeenCalledWith(bodyMock);
   });
 
   it('update should calls to bookService.update', async () => {
-    const result: any = await controller.update(bookId, bodyMock);
-
+    await controller.update(bookId, bodyMock);
     expect(updateSpy).toHaveBeenCalledWith(bookId, bodyMock);
   });
 
   it('remove should calls to bookService.remove', async () => {
-    const result: any = await controller.remove(bookId);
-
+    await controller.remove(bookId);
     expect(removeSpy).toHaveBeenCalledWith(bookId);
   });
 });
