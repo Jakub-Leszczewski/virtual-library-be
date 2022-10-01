@@ -9,7 +9,7 @@ export class BookOnlyBorrowedUserGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request: Request = context.switchToHttp().getRequest();
-    const bookId = request.params?.bookId;
+    const bookId = request.params?.id;
     const user = request.user as User;
 
     if (!user) throw new Error('User is undefined');
@@ -19,6 +19,7 @@ export class BookOnlyBorrowedUserGuard implements CanActivate {
       relations: ['borrowedBy'],
     });
     if (!book) throw new NotFoundException();
+    console.log(book);
 
     return book.borrowedBy?.id === user.id;
   }

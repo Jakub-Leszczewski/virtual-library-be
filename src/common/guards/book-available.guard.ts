@@ -1,4 +1,3 @@
-import { User } from '../../user/entities/user.entity';
 import { CanActivate, ExecutionContext, Injectable, NotFoundException } from '@nestjs/common';
 import { Request } from 'express';
 import { Book } from '../../book/entities/book.entity';
@@ -9,7 +8,7 @@ export class BookAvailableGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request: Request = context.switchToHttp().getRequest();
-    const bookId = request.params?.bookId;
+    const bookId = request.params?.id;
 
     const book = await Book.findOne({
       where: { id: bookId },

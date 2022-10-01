@@ -17,6 +17,7 @@ import { FindAllQueryDto } from './dto/find-all-query.dto';
 import { config } from '../config/config';
 import { UserService } from '../user/user.service';
 import { User } from '../user/entities/user.entity';
+import { log } from 'util';
 
 @Injectable()
 export class BookService {

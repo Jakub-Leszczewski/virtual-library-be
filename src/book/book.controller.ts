@@ -77,7 +77,6 @@ export class BookController {
     return this.bookService.remove(id);
   }
 
-  //@TODO create guard who check book available
   @Patch(':id/borrow')
   @UseGuards(JwtAuthGuard, RoleGuard, BookAvailableGuard)
   @SetRole('user')
@@ -85,7 +84,6 @@ export class BookController {
     return this.bookService.borrow(id, user);
   }
 
-  //@TODO create guard who check if borrowedBy equal logged user
   @Delete(':id/borrow')
   @UseGuards(JwtAuthGuard, RoleGuard, BookOnlyBorrowedUserGuard)
   @SetRole('user')
