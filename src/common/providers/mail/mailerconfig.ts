@@ -5,7 +5,7 @@ import { config } from '../../../config/config';
 export = {
   transport: `smtp://${config.mailUsername}:${config.mailPassword}@${config.mailHost}:${config.mailPort}`,
   defaults: {
-    from: 'no-replay@exaple.com',
+    from: config.mailFrom,
   },
   template: {
     dir: join(__dirname, '../../../../templates/mail'),
