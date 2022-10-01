@@ -1,22 +1,5 @@
 <div id="top"></div>
-<!--
-*** Thanks for checking out the Best-README-Template. If you have a suggestion
-*** that would make this better, please fork the repo and create a pull request
-*** or simply open an issue with the tag "enhancement".
-*** Don't forget to give the project a star!
-*** Thanks again! Now go create something AMAZING! :D
--->
 
-
-
-<!-- PROJECT SHIELDS -->
-<!--
-*** I'm using markdown "reference style" links for readability.
-*** Reference links are enclosed in brackets [ ] instead of parentheses ( ).
-*** See the bottom of this document for the declaration of the reference variables
-*** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
-*** https://www.markdownguide.org/basic-syntax/#reference-style-links
--->
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
@@ -50,7 +33,7 @@
       <ul>
         <li><a href="#auth">Autoryzacja</a></li>
         <li><a href="#user">Użytkownik</a></li>
-        <li><a href="#book">Książki</a></li>
+        <li><a href="#book">Książka</a></li>
       </ul>
     </li>
   </ol>
@@ -102,7 +85,7 @@
    ```
 4. zmień nazwę pliku `src/config/config.example.ts` na `src/config/config.ts`odpowiednio uzupełnij plik config `src/config/config.ts`
 
-        ```ts
+     ```ts
          export const config = {
            itemsCountPerPage: 10,  // maksymalna ilość elementów na jedną stronę
            dbHost: 'localhost',  // Adres ip do bazy danych
@@ -123,7 +106,7 @@
            mailPassword: 'admin', // hasło serwera smtp
            mailFrom: 'no-replay@exaple.com', // adres email z którego będą przychodzić wiadomości
          };
-        ```
+     ```
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -138,7 +121,7 @@
 ## Endpoints
 
 ### Auth
-* **POST /auth/login** - loguje użytkownika i ustawia mu ciastko z tokenem dostępu
+* **POST /auth/login** - loguje użytkownika
   ```ts
     // dto dla body
     {
@@ -146,7 +129,7 @@
       password: string;
     }
   ```
-* **DELETE /auth/logout** - wylogowanie użytkownika, usuwa jwt z ciastek **(tylko zalogowany)**
+* **DELETE /auth/logout** - wylogowanie użytkownika **(tylko zalogowany)**
 
 * **GET /auth/user** - pobiera aktualnie zalogowanego użytkownika **(tylko zalogowany)**
 <p align="right">(<a href="#top">back to top</a>)</p>
