@@ -15,4 +15,5 @@ export const config = {
   mailPort: 1234,
   mailUsername: 'mail_username',
   mailPassword: 'mail_password',
+  mailFrom: 'no-replay@exaple.com',
 };
