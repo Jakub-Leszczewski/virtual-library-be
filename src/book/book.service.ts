@@ -4,10 +4,13 @@ import { UpdateBookDto } from './dto/update-book.dto';
 import { Book } from './entities/book.entity';
 import {
   BookStatus,
+  BorrowBookResponse,
   CreateBookResponse,
   FindAllBookResponse,
   FindOneBookResponse,
+  NotSecureBookData,
   RemoveBookResponse,
+  ReturnBookResponse,
   SecureBookData,
   UpdateBookResponse,
 } from '../types';
@@ -17,7 +20,6 @@ import { FindAllQueryDto } from './dto/find-all-query.dto';
 import { config } from '../config/config';
 import { UserService } from '../user/user.service';
 import { User } from '../user/entities/user.entity';
-import { log } from 'util';
 
 @Injectable()
 export class BookService {
@@ -105,11 +107,11 @@ export class BookService {
     return this.filter(book);
   }
 
-  async borrow(id: string, user: User) {
+  async bookBorrow(id: string, user: User): Promise<BorrowBookResponse> {
     if (!id) throw new BadRequestException();
 
     const book = await this.getBook({ id });
-    if (!book) return new NotFoundException();
+    if (!book) throw new NotFoundException();
 
     book.borrowedBy = user;
     book.borrowedAt = new Date();
@@ -118,11 +120,11 @@ export class BookService {
     return this.filter(book);
   }
 
-  async return(id) {
+  async bookReturn(id): Promise<ReturnBookResponse> {
     if (!id) throw new BadRequestException();
 
     const book = await this.getBook({ id });
-    if (!book) return new NotFoundException();
+    if (!book) throw new NotFoundException();
 
     book.borrowedBy = null;
     book.borrowedAt = null;
@@ -140,7 +142,7 @@ export class BookService {
     };
   }
 
-  filterNotSecure(book: Book) {
+  filterNotSecure(book: Book): NotSecureBookData {
     const { borrowedBy, ...bookResponse } = book;
     const filteredUser = borrowedBy && this.userService.filter(borrowedBy);
 

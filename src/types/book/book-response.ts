@@ -9,3 +9,6 @@ export type FindAllBookResponse = {
   totalPages: number;
   totalBooksCount: number;
 };
+
+export type BorrowBookResponse = SecureBookData;
+export type ReturnBookResponse = SecureBookData;

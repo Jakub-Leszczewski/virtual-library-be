@@ -16,10 +16,12 @@ import { UpdateBookDto } from './dto/update-book.dto';
 import { RoleGuard } from '../common/guards/role.guard';
 import { SetRole } from '../common/decorators/set-role.decorator';
 import {
+  BorrowBookResponse,
   CreateBookResponse,
   FindAllBookResponse,
   FindOneBookResponse,
   RemoveBookResponse,
+  ReturnBookResponse,
   UpdateBookResponse,
   UserRole,
 } from '../types';
@@ -80,14 +82,14 @@ export class BookController {
   @Patch(':id/borrow')
   @UseGuards(JwtAuthGuard, RoleGuard, BookAvailableGuard)
   @SetRole('user')
-  async bookBorrow(@Param('id') id: string, @UserObj() user: User) {
-    return this.bookService.borrow(id, user);
+  async bookBorrow(@Param('id') id: string, @UserObj() user: User): Promise<BorrowBookResponse> {
+    return this.bookService.bookBorrow(id, user);
   }
 
   @Delete(':id/borrow')
   @UseGuards(JwtAuthGuard, RoleGuard, BookOnlyBorrowedUserGuard)
   @SetRole('user')
-  async bookReturn(@Param('id') id: string) {
-    return this.bookService.return(id);
+  async bookReturn(@Param('id') id: string): Promise<ReturnBookResponse> {
+    return this.bookService.bookReturn(id);
   }
 }

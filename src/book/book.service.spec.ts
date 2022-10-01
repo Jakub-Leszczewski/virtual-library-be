@@ -273,4 +273,52 @@ describe('BookService', () => {
     expect(filterSpy).toHaveBeenCalled();
     expect(removeBookMock.mock.calls.length).toBe(1);
   });
+
+  it('bookBorrow should throw BadRequestException if id is empty', async () => {
+    await expect(async () => service.bookBorrow('', userMock)).rejects.toThrowError(
+      BadRequestException,
+    );
+  });
+
+  it('bookBorrow should throw NotFoundException if Book is empty', async () => {
+    jest.spyOn(BookService.prototype, 'getBook').mockResolvedValue(null);
+
+    await expect(async () => service.bookBorrow(bookId, userMock)).rejects.toThrowError(
+      NotFoundException,
+    );
+  });
+
+  it('bookBorrow should return data with given id', async () => {
+    const filterSpy = jest.spyOn(BookService.prototype, 'filter').mockImplementation((e: any) => e);
+    jest.spyOn(BookService.prototype, 'getBook').mockResolvedValue(bookMock);
+
+    const result = await service.bookBorrow(bookId, userMock);
+
+    expect(result).toBeDefined();
+    expect(result.id).toBe(bookId);
+    expect(filterSpy).toHaveBeenCalled();
+    expect(saveBookMock.mock.calls.length).toBe(1);
+  });
+
+  it('bookReturn should throw BadRequestException if id is empty', async () => {
+    await expect(async () => service.bookReturn('')).rejects.toThrowError(BadRequestException);
+  });
+
+  it('bookReturn should throw NotFoundException if Book is empty', async () => {
+    jest.spyOn(BookService.prototype, 'getBook').mockResolvedValue(null);
+
+    await expect(async () => service.bookReturn(bookId)).rejects.toThrowError(NotFoundException);
+  });
+
+  it('bookReturn should return data with given id', async () => {
+    const filterSpy = jest.spyOn(BookService.prototype, 'filter').mockImplementation((e: any) => e);
+    jest.spyOn(BookService.prototype, 'getBook').mockResolvedValue(bookMock);
+
+    const result = await service.bookReturn(bookId);
+
+    expect(result).toBeDefined();
+    expect(result.id).toBe(bookId);
+    expect(filterSpy).toHaveBeenCalled();
+    expect(saveBookMock.mock.calls.length).toBe(1);
+  });
 });

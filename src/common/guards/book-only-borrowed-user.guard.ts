@@ -19,7 +19,6 @@ export class BookOnlyBorrowedUserGuard implements CanActivate {
       relations: ['borrowedBy'],
     });
     if (!book) throw new NotFoundException();
-    console.log(book);
 
     return book.borrowedBy?.id === user.id;
   }
