@@ -72,4 +72,14 @@ export class BookController {
   async remove(@Param('id') id: string): Promise<RemoveBookResponse> {
     return this.bookService.remove(id);
   }
+
+  @Patch(':id/borrow')
+  async bookBorrow() {
+    return undefined;
+  }
+
+  @Delete(':id/borrow')
+  async bookReturn() {
+    return undefined;
+  }
 }
