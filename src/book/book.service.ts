@@ -47,7 +47,7 @@ export class BookService {
     });
 
     return {
-      books: secure ? book.map((e) => this.filterSecure(e)) : book.map((e) => this.filter(e)),
+      books: secure ? book.map((e) => this.filterNotSecure(e)) : book.map((e) => this.filter(e)),
       totalPages: Math.ceil(totalBooksCount / config.itemsCountPerPage),
       totalBooksCount,
     };
@@ -61,7 +61,7 @@ export class BookService {
 
     if (!secure) return this.filter(book);
 
-    return book;
+    return this.filterNotSecure(book);
   }
 
   async create(createBookDto: CreateBookDto): Promise<CreateBookResponse> {
@@ -112,7 +112,7 @@ export class BookService {
     };
   }
 
-  filterSecure(book: Book) {
+  filterNotSecure(book: Book) {
     const { borrowedBy, ...bookResponse } = book;
     const filteredUser = borrowedBy && this.userService.filter(borrowedBy);
 

@@ -12,6 +12,12 @@ const createResult = 'create';
 const updateResult = 'update';
 const removeResult = 'remove';
 
+const findAllSpy = jest.fn();
+const findOneSpy = jest.fn();
+const createSpy = jest.fn();
+const updateSpy = jest.fn();
+const removeSpy = jest.fn();
+
 const bookId = uuid();
 const bodyMock: any = { body: true };
 const queryMock: any = { body: true };
@@ -26,28 +32,11 @@ describe('BookController', () => {
       .useMocker((token) => {
         if (token === BookService) {
           return {
-            findAll: jest.fn(async (query) => ({
-              query,
-              result: findAllResult,
-            })),
-            findOne: jest.fn(async (id, query) => ({
-              id,
-              query,
-              result: findOneResult,
-            })),
-            create: jest.fn(async (body) => ({
-              body,
-              result: createResult,
-            })),
-            update: jest.fn(async (id, body) => ({
-              id,
-              body,
-              result: updateResult,
-            })),
-            remove: jest.fn(async (id) => ({
-              id,
-              result: removeResult,
-            })),
+            findAll: findAllSpy,
+            findOne: findOneSpy,
+            create: createSpy,
+            update: updateSpy,
+            remove: removeSpy,
           };
         } else if (typeof token === 'function') {
           const mockMetadata = moduleMocker.getMetadata(token) as MockFunctionMetadata<any, any>;
@@ -67,37 +56,30 @@ describe('BookController', () => {
   it('findOne should calls to bookService.findOne', async () => {
     const result: any = await controller.findOne(bookId, queryMock);
 
-    expect(result.result).toBe(findOneResult);
-    expect(result.id).toBe(bookId);
-    expect(result.query).toEqual(queryMock);
+    expect(findOneSpy).toHaveBeenCalledWith(bookId, queryMock);
   });
 
   it('findAll should calls to bookService.findAll', async () => {
     const result: any = await controller.findAll(queryMock);
 
-    expect(result.result).toBe(findAllResult);
-    expect(result.query).toEqual(queryMock);
+    expect(findAllSpy).toHaveBeenCalledWith(queryMock);
   });
 
   it('create should calls to bookService.create', async () => {
     const result: any = await controller.create(bodyMock);
 
-    expect(result.result).toBe(createResult);
-    expect(result.body).toEqual(bodyMock);
+    expect(createSpy).toHaveBeenCalledWith(bodyMock);
   });
 
   it('update should calls to bookService.update', async () => {
     const result: any = await controller.update(bookId, bodyMock);
 
-    expect(result.id).toBe(bookId);
-    expect(result.result).toBe(updateResult);
-    expect(result.body).toEqual(bodyMock);
+    expect(updateSpy).toHaveBeenCalledWith(bookId, bodyMock);
   });
 
   it('remove should calls to bookService.remove', async () => {
     const result: any = await controller.remove(bookId);
 
-    expect(result.id).toBe(bookId);
-    expect(result.result).toBe(removeResult);
+    expect(removeSpy).toHaveBeenCalledWith(bookId);
   });
 });
