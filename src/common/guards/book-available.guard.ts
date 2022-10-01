@@ -4,15 +4,12 @@ import { Request } from 'express';
 import { Book } from '../../book/entities/book.entity';
 
 @Injectable()
-export class OnlyRolesSecureDataGuard implements CanActivate {
+export class BookAvailableGuard implements CanActivate {
   constructor() {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request: Request = context.switchToHttp().getRequest();
     const bookId = request.params?.bookId;
-    const user = request.user as User;
-
-    if (!user) throw new Error('User is undefined');
 
     const book = await Book.findOne({
       where: { id: bookId },

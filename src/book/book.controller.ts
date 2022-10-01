@@ -29,6 +29,8 @@ import { OnlyRolesSecureDataGuard } from '../common/guards/only-roles-secure-dat
 import { FindAllQueryDto } from './dto/find-all-query.dto';
 import { UserObj } from '../common/decorators/user.decorator';
 import { User } from '../user/entities/user.entity';
+import { BookAvailableGuard } from '../common/guards/book-available.guard';
+import { BookOnlyBorrowedUserGuard } from '../common/guards/book-only-borrowed-user.guard';
 
 @Controller('book')
 export class BookController {
@@ -77,7 +79,7 @@ export class BookController {
 
   //@TODO create guard who check book available
   @Patch(':id/borrow')
-  @UseGuards(JwtAuthGuard, RoleGuard)
+  @UseGuards(JwtAuthGuard, RoleGuard, BookAvailableGuard)
   @SetRole('user')
   async bookBorrow(@Param('id') id: string, @UserObj() user: User) {
     return this.bookService.borrow(id, user);
@@ -85,7 +87,7 @@ export class BookController {
 
   //@TODO create guard who check if borrowedBy equal logged user
   @Delete(':id/borrow')
-  @UseGuards(JwtAuthGuard, RoleGuard)
+  @UseGuards(JwtAuthGuard, RoleGuard, BookOnlyBorrowedUserGuard)
   @SetRole('user')
   async bookReturn(@Param('id') id: string) {
     return this.bookService.return(id);
