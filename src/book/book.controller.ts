@@ -84,7 +84,7 @@ export class BookController {
 
   //@TODO create guard who check if borrowedBy equal logged user
   @Delete(':id/borrow')
-  async bookReturn() {
-    return undefined;
+  async bookReturn(@Param('id') id: string) {
+    return this.bookService.return(id);
   }
 }

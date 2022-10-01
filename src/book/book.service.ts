@@ -109,8 +109,23 @@ export class BookService {
     if (!id) throw new BadRequestException();
 
     const book = await this.getBook({ id });
+    if (!book) return new NotFoundException();
+
     book.borrowedBy = user;
     book.borrowedAt = new Date();
+    await book.save();
+
+    return this.filter(book);
+  }
+
+  async return(id) {
+    if (!id) throw new BadRequestException();
+
+    const book = await this.getBook({ id });
+    if (!book) return new NotFoundException();
+
+    book.borrowedBy = null;
+    book.borrowedAt = null;
     await book.save();
 
     return this.filter(book);
