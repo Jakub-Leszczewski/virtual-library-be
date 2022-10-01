@@ -1,4 +1,5 @@
 import { UserRole } from './user-role';
+import { Book } from '../../book/entities/book.entity';
 
 export interface UserInterface {
   id: string;
@@ -9,6 +10,7 @@ export interface UserInterface {
   hashPwd: string;
   jwtId: string;
   role: UserRole;
+  borrowedBooks: Book[];
 }
 
 export type SecureUserData = Omit<UserInterface, 'hashPwd' | 'jwtId'>;

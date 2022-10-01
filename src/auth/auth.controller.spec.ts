@@ -7,9 +7,9 @@ import { MockFunctionMetadata, ModuleMocker } from 'jest-mock';
 
 const moduleMocker = new ModuleMocker(global);
 
-const loginResult = 'login';
-const logoutResult = 'logout';
-const filterResult = 'filter';
+const loginSpy = jest.fn();
+const logoutSpy = jest.fn();
+const userFilterSpy = jest.fn();
 
 const userId = uuid();
 const userMock: any = { id: userId };
@@ -25,14 +25,14 @@ describe('AuthController', () => {
       .useMocker((token) => {
         if (token === AuthService) {
           return {
-            login: jest.fn(async (user: any, res: any) => ({ user, res, result: loginResult })),
-            logout: jest.fn(async (user: any, res: any) => ({ user, res, result: logoutResult })),
+            login: loginSpy,
+            logout: logoutSpy,
           };
         }
 
         if (token === UserService) {
           return {
-            filter: jest.fn(async (user) => ({ user, result: filterResult })),
+            filter: userFilterSpy,
           };
         }
 
@@ -52,25 +52,17 @@ describe('AuthController', () => {
   });
 
   it('login should calls to authService.login', async () => {
-    const result: any = await controller.login(userMock, resMock);
-
-    expect(result.result).toBe(loginResult);
-    expect(result.user).toEqual(userMock);
-    expect(result.res).toEqual(resMock);
+    await controller.login(userMock, resMock);
+    expect(loginSpy).toHaveBeenCalledWith(userMock, resMock);
   });
 
   it('logout should calls to authService.logout', async () => {
-    const result: any = await controller.logout(userMock, resMock);
-
-    expect(result.result).toBe(logoutResult);
-    expect(result.user).toEqual(userMock);
-    expect(result.res).toEqual(resMock);
+    await controller.logout(userMock, resMock);
+    expect(logoutSpy).toHaveBeenCalledWith(userMock, resMock);
   });
 
   it('getAuthUser should calls to userService.findOne', async () => {
-    const result: any = await controller.getAuthUser(userMock);
-
-    expect(result.result).toBe(filterResult);
-    expect(result.user).toBe(userMock);
+    await controller.getAuthUser(userMock);
+    expect(userFilterSpy).toHaveBeenCalledWith(userMock);
   });
 });

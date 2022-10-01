@@ -6,9 +6,9 @@ import { v4 as uuid } from 'uuid';
 
 const moduleMocker = new ModuleMocker(global);
 
-const createUserResult = 'createUser';
-const sendAdminTokenResult = 'sendAdminToken';
-const createAdminResult = 'createAdmin';
+const createUserSpy = jest.fn();
+const sendAdminTokenSpy = jest.fn();
+const createAdminSpy = jest.fn();
 
 const bodyMock: any = { body: true };
 const tokenMock = uuid();
@@ -23,26 +23,14 @@ describe('UserController', () => {
       .useMocker((token) => {
         if (token === UserService) {
           return {
-            createUser: jest.fn(async (body) => ({
-              body,
-              result: createUserResult,
-            })),
-            sendAdminToken: jest.fn(async (body) => ({
-              body,
-              result: sendAdminTokenResult,
-            })),
-            createAdmin: jest.fn(async (token, body) => ({
-              token,
-              body,
-              result: createAdminResult,
-            })),
+            createUser: createUserSpy,
+            sendAdminToken: sendAdminTokenSpy,
+            createAdmin: createAdminSpy,
           };
         }
 
         if (typeof token === 'function') {
-          const mockMetadata = moduleMocker.getMetadata(
-            token,
-          ) as MockFunctionMetadata<any, any>;
+          const mockMetadata = moduleMocker.getMetadata(token) as MockFunctionMetadata<any, any>;
           const Mock = moduleMocker.generateFromMetadata(mockMetadata);
           return new Mock();
         }
@@ -56,25 +44,18 @@ describe('UserController', () => {
     expect(controller).toBeDefined();
   });
 
-  it('createUser - should calls to userService.createUser', async () => {
-    const result: any = await controller.createUser(bodyMock);
-
-    expect(result.result).toBe(createUserResult);
-    expect(result.body).toEqual(bodyMock);
+  it('createUser should calls to userService.createUser', async () => {
+    await controller.createUser(bodyMock);
+    expect(createUserSpy).toHaveBeenCalledWith(bodyMock);
   });
 
   it('sendAdminToken - should calls to userService.sendAdminToken', async () => {
-    const result: any = await controller.sendAdminToken(bodyMock);
-
-    expect(result.result).toBe(sendAdminTokenResult);
-    expect(result.body).toBe(bodyMock);
+    await controller.sendAdminToken(bodyMock);
+    expect(sendAdminTokenSpy).toHaveBeenCalledWith(bodyMock);
   });
 
   it('createAdmin - should calls to userService.createAdmin', async () => {
-    const result: any = await controller.createAdmin(tokenMock, bodyMock);
-
-    expect(result.result).toBe(createAdminResult);
-    expect(result.token).toBe(tokenMock);
-    expect(result.body).toEqual(bodyMock);
+    await controller.createAdmin(tokenMock, bodyMock);
+    expect(createAdminSpy).toHaveBeenCalledWith(tokenMock, bodyMock);
   });
 });

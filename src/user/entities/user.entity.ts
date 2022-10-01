@@ -1,11 +1,6 @@
-import {
-  BaseEntity,
-  Column,
-  Entity,
-  Index,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { BaseEntity, Column, Entity, Index, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { UserInterface, UserRole } from '../../types';
+import { Book } from '../../book/entities/book.entity';
 
 @Entity()
 export class User extends BaseEntity implements UserInterface {
@@ -42,4 +37,7 @@ export class User extends BaseEntity implements UserInterface {
     enum: UserRole,
   })
   role: UserRole;
+
+  @OneToMany((type) => Book, (book) => book.borrowedBy)
+  borrowedBooks: Book[];
 }

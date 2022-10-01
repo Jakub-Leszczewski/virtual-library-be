@@ -168,7 +168,6 @@ describe('UserService', () => {
     await expect(async () =>
       service.create({ ...createUserDtoMock, email: existEmail }, UserRole.User),
     ).rejects.toThrowError(ConflictException);
-
     await expect(async () =>
       service.create({ ...createUserDtoMock, username: existUsername }, UserRole.User),
     ).rejects.toThrowError(ConflictException);
@@ -210,22 +209,13 @@ describe('UserService', () => {
   });
 
   it('createUser should return correct data', async () => {
-    let createArgs: any = {};
-    jest
-      .spyOn(UserService.prototype, 'create')
-      .mockImplementation(async (createUserDto: any, role: UserRole) => {
-        createArgs = {
-          body: createUserDto,
-          role,
-        };
-        return userMock;
-      });
+    const createSpy = jest.spyOn(UserService.prototype, 'create').mockResolvedValue(userMock);
+    jest.spyOn(UserService.prototype, 'filter').mockImplementation((e) => e);
 
     const result = await service.create(createUserDtoMock, UserRole.User);
 
-    expect(result).toBeDefined();
-    expect(createArgs.role).toBe(UserRole.User);
-    expect(createArgs.body).toEqual(createUserDtoMock);
+    expect(result).toEqual(userMock);
+    expect(createSpy).toHaveBeenCalledWith(createUserDtoMock, UserRole.User);
   });
 
   it('createAdmin should throw BadRequestException if token is empty', async () => {
@@ -243,26 +233,19 @@ describe('UserService', () => {
   });
 
   it('createAdmin should return correct data', async () => {
-    const createArgs: any = {};
-    jest
-      .spyOn(UserService.prototype, 'create')
-      .mockImplementation(async (createUserDto: any, role: UserRole) => {
-        createArgs.body = createUserDto;
-        createArgs.role = role;
-        return userMock;
-      });
+    const createSpy = jest.spyOn(UserService.prototype, 'create').mockResolvedValue(userMock);
+    const userFilterSpy = jest.spyOn(UserService.prototype, 'filter').mockImplementation((e) => e);
     jest.spyOn(AdminToken, 'findOne').mockResolvedValue(adminTokenMock);
 
     const result = await service.createAdmin(adminToken, createUserDtoMock);
 
-    expect(result).toBeDefined();
-    expect(createArgs.role).toBe(UserRole.Admin);
-    expect(createArgs.body).toEqual(createUserDtoMock);
+    expect(result).toEqual(userMock);
+    expect(userFilterSpy).toHaveBeenCalled();
+    expect(createSpy).toHaveBeenCalledWith(createUserDtoMock, UserRole.Admin);
   });
 
   it('createAdmin should remove AdminToken', async () => {
     await service.createAdmin(adminToken, createUserDtoMock);
-
     expect(adminTokenRemoveMock.mock.calls.length).toBe(1);
   });
 
