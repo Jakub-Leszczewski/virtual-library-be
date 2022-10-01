@@ -11,8 +11,12 @@ const findOneSpy = jest.fn();
 const createSpy = jest.fn();
 const updateSpy = jest.fn();
 const removeSpy = jest.fn();
+const bookBorrowSpy = jest.fn();
+const bookReturnSpy = jest.fn();
 
 const bookId = uuid();
+const userId = uuid();
+const userMock: any = { id: userId };
 const bodyMock: any = { body: true };
 const queryMock: any = { body: true };
 
@@ -31,6 +35,8 @@ describe('BookController', () => {
             create: createSpy,
             update: updateSpy,
             remove: removeSpy,
+            bookBorrow: bookBorrowSpy,
+            bookReturn: bookReturnSpy,
           };
         } else if (typeof token === 'function') {
           const mockMetadata = moduleMocker.getMetadata(token) as MockFunctionMetadata<any, any>;
@@ -70,5 +76,15 @@ describe('BookController', () => {
   it('remove should calls to bookService.remove', async () => {
     await controller.remove(bookId);
     expect(removeSpy).toHaveBeenCalledWith(bookId);
+  });
+
+  it('bookBorrow should calls to bookService.bookBorrow', async () => {
+    await controller.bookBorrow(bookId, userMock);
+    expect(bookBorrowSpy).toHaveBeenCalledWith(bookId, userMock);
+  });
+
+  it('bookReturn should calls to bookService.bookReturn', async () => {
+    await controller.bookReturn(bookId);
+    expect(bookReturnSpy).toHaveBeenCalledWith(bookId);
   });
 });

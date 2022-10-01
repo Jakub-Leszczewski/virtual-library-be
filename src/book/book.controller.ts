@@ -16,10 +16,12 @@ import { UpdateBookDto } from './dto/update-book.dto';
 import { RoleGuard } from '../common/guards/role.guard';
 import { SetRole } from '../common/decorators/set-role.decorator';
 import {
+  BorrowBookResponse,
   CreateBookResponse,
   FindAllBookResponse,
   FindOneBookResponse,
   RemoveBookResponse,
+  ReturnBookResponse,
   UpdateBookResponse,
   UserRole,
 } from '../types';
@@ -27,6 +29,10 @@ import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { FindOneQueryDto } from './dto/find-one-query.dto';
 import { OnlyRolesSecureDataGuard } from '../common/guards/only-roles-secure-data.guard';
 import { FindAllQueryDto } from './dto/find-all-query.dto';
+import { UserObj } from '../common/decorators/user.decorator';
+import { User } from '../user/entities/user.entity';
+import { BookAvailableGuard } from '../common/guards/book-available.guard';
+import { BookOnlyBorrowedUserGuard } from '../common/guards/book-only-borrowed-user.guard';
 
 @Controller('book')
 export class BookController {
@@ -71,5 +77,19 @@ export class BookController {
   @SetRole(UserRole.Admin)
   async remove(@Param('id') id: string): Promise<RemoveBookResponse> {
     return this.bookService.remove(id);
+  }
+
+  @Patch(':id/borrow')
+  @UseGuards(JwtAuthGuard, RoleGuard, BookAvailableGuard)
+  @SetRole('user')
+  async bookBorrow(@Param('id') id: string, @UserObj() user: User): Promise<BorrowBookResponse> {
+    return this.bookService.bookBorrow(id, user);
+  }
+
+  @Delete(':id/borrow')
+  @UseGuards(JwtAuthGuard, RoleGuard, BookOnlyBorrowedUserGuard)
+  @SetRole('user')
+  async bookReturn(@Param('id') id: string): Promise<ReturnBookResponse> {
+    return this.bookService.bookReturn(id);
   }
 }
